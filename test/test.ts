@@ -25,12 +25,12 @@ expect(isType('foo', {kind: 'enum', values: ['abc', '123']} as const)).toBe(fals
   const x = {};
   if (isType(x, {kind: 'object', properties: {
     foo: {kind: 'null'},
-    bar: {kind: 'array', value: {kind: 'string'}},
+    bar: {kind: 'array', subtype: {kind: 'string'}},
     date: {kind: 'instanceof', value: Date},
     fiftyfive: {kind: 'literal', value: 55},
     enum: {kind: 'enum', values: ['abc', '123', 42]},
-    intersection: {kind: 'intersection', value1: {kind: 'object', properties: {foo: {kind: 'string'}}}, value2: {kind: 'object', properties: {bar: {kind: 'string'}}}},
-    union: {kind: 'union', value1: {kind: 'object', properties: {foo: {kind: 'string'}}}, value2: {kind: 'object', properties: {bar: {kind: 'string'}}}},
+    intersection: {kind: 'intersection', type1: {kind: 'object', properties: {foo: {kind: 'string'}}}, type2: {kind: 'object', properties: {bar: {kind: 'string'}}}},
+    union: {kind: 'union', type1: {kind: 'object', properties: {foo: {kind: 'string'}}}, type2: {kind: 'object', properties: {bar: {kind: 'string'}}}},
   }} as const)) {
     x.foo === null;
 
@@ -73,7 +73,7 @@ expect(isType('foo', {kind: 'enum', values: ['abc', '123']} as const)).toBe(fals
 }
 
 {
-  const def = {kind: 'array', value: {kind: 'number'}} as const;
+  const def = {kind: 'array', subtype: {kind: 'number'}} as const;
   const x: DescribeType<typeof def> = [] as any;
   x.map(y => y.toExponential(5));
 }

@@ -2,9 +2,9 @@ declare const recursiveSymbol: unique symbol;
 type Type =
   {kind: 'string'|'number'|'boolean'|'null'|'undefined'|'symbol'|'bigint'|'any'} |
   {kind: 'enum', values: unknown} |
-  {kind: 'array', value: Type} | 
-  {kind: 'intersection', value1: Type, value2: Type} | 
-  {kind: 'union', value1: Type, value2: Type} | 
+  {kind: 'array', subtype: Type} | 
+  {kind: 'intersection', type1: Type, type2: Type} | 
+  {kind: 'union', type1: Type, type2: Type} | 
   {kind: 'literal', value: unknown} |
   {kind: 'instanceof', value: unknown} |
   {kind: 'object', properties: {[key: string]: Type} };
@@ -22,10 +22,10 @@ type _DescribeType<T> =
     T extends {kind: 'bigint'} ? bigint :
     T extends {kind: 'any'} ? any :
     T extends {kind: 'enum'} ? UnboxArray<T['values']> :
-    T extends {kind: 'array'} ? _DescribeType<T['value']>[] :
+    T extends {kind: 'array'} ? _DescribeType<T['subtype']>[] :
     T extends {kind: 'literal'} ? T['value'] :
-    T extends {kind: 'intersection'} ? ({[recursiveSymbol]: _DescribeType<T['value1']>} & {[recursiveSymbol]: _DescribeType<T['value2']>}) :
-    T extends {kind: 'union'} ? ({[recursiveSymbol]: _DescribeType<T['value1']>} | {[recursiveSymbol]: _DescribeType<T['value2']>}) :
+    T extends {kind: 'intersection'} ? ({[recursiveSymbol]: _DescribeType<T['type1']>} & {[recursiveSymbol]: _DescribeType<T['type2']>}) :
+    T extends {kind: 'union'} ? ({[recursiveSymbol]: _DescribeType<T['type1']>} | {[recursiveSymbol]: _DescribeType<T['type2']>}) :
     T extends {kind: 'instanceof', value: {prototype: infer U}} ? U :
     T extends {kind: 'object'} ? {[key in keyof T['properties']]: UnrollSpecial<_DescribeType<T['properties'][key]>>} :
     never
@@ -66,13 +66,13 @@ export function isType<T extends Type>(data: unknown, description: Type & T): da
   if (description.kind === 'undefined')
     return data === undefined;
   if (description.kind === 'array')
-    return Array.isArray(data) && data.reduce((x, prev) => prev || isType(x, description.value), false);
+    return Array.isArray(data) && data.reduce((x, prev) => prev || isType(x, description.subtype), false);
   if (description.kind === 'literal')
     return Object.is(data, description.value);
   if (description.kind === 'intersection')
-    return isType(data, description.value1) && isType(data, description.value2);
+    return isType(data, description.type1) && isType(data, description.type2);
   if (description.kind === 'union')
-    return isType(data, description.value1) || isType(data, description.value2);
+    return isType(data, description.type1) || isType(data, description.type2);
   if (description.kind === 'instanceof')
     return data instanceof (description.value as Function);
   if (description.kind === 'object') {

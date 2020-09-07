@@ -1,13 +1,18 @@
 {
   "name": "type-descriptor",
   "version": "1.0.0",
-  "description": "",
+  "description": "Allows types to be described with JavaScript, and computes TypeScript types from those descriptions.",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JoelEinbinder/type-descriptor.git"
+  },
   "scripts": {
     "lint": "eslint .",
     "build": "tsc -p .",
     "watch": "tsc -p . --watch",
-    "test": "node test/test.js"
+    "test": "node test/test.js",
+    "prepare": "tsc -p ."
   },
   "author": "Joel Einbinder",
   "license": "MIT",
