@@ -1,12 +1,12 @@
 declare const recursiveSymbol: unique symbol;
 type Type =
   {kind: 'string'|'number'|'boolean'|'null'|'undefined'|'symbol'|'bigint'|'any'} |
-  {kind: 'enum', values: string[]} |
+  {kind: 'enum', values: unknown} |
   {kind: 'array', value: Type} | 
   {kind: 'intersection', value1: Type, value2: Type} | 
   {kind: 'union', value1: Type, value2: Type} | 
-  {kind: 'literal', value: any} |
-  {kind: 'instanceof', value: Function & {prototype: any}} |
+  {kind: 'literal', value: unknown} |
+  {kind: 'instanceof', value: unknown} |
   {kind: 'object', properties: {[key: string]: Type} };
 type Writable<T> = {-readonly [key in keyof T]: Writable<T[key]>};
 type Readonly<T> = {readonly [key in keyof T]: Readonly<T[key]>};
@@ -24,14 +24,14 @@ type _DescribeType<T> =
     T extends {kind: 'enum'} ? UnboxArray<T['values']> :
     T extends {kind: 'array'} ? _DescribeType<T['value']>[] :
     T extends {kind: 'literal'} ? T['value'] :
-    T extends {kind: 'intersection'} ? ({[recursiveSymbol]: _DescribeType<T['value1']>} & {[recursiveSymbol]: _DescribeType<T['value2']>})[] :
+    T extends {kind: 'intersection'} ? ({[recursiveSymbol]: _DescribeType<T['value1']>} & {[recursiveSymbol]: _DescribeType<T['value2']>}) :
     T extends {kind: 'union'} ? ({[recursiveSymbol]: _DescribeType<T['value1']>} | {[recursiveSymbol]: _DescribeType<T['value2']>}) :
-    T extends {kind: 'instanceof'} ? (T['value'] extends {prototype: infer U} ? U : never) :
-    T extends {kind: 'object'} ? {[key in keyof T['properties']]: _DescribeType<T['properties'][key]>} :
+    T extends {kind: 'instanceof', value: {prototype: infer U}} ? U :
+    T extends {kind: 'object'} ? {[key in keyof T['properties']]: UnrollSpecial<_DescribeType<T['properties'][key]>>} :
     never
   ) : never;
 export type DescribeType<T extends Readonly<Type>> = UnrollSpecial<_DescribeType<T>>;
-type UnboxArray<Type> = Type extends Array<infer U> ? U : never;
+type UnboxArray<Type> = Writable<Type> extends Array<infer U> ? U : never;
 
 type UnrollSpecial<A> = 
   (A extends {[recursiveSymbol]: infer B} ?
@@ -48,7 +48,7 @@ type UnrollSpecial<A> =
 
 export function isType<T extends Type>(data: any, description: Type & T): data is DescribeType<T> {
   if (description.kind === 'enum')
-    return description.values.some(x => x === data);
+    return (description.values as any[]).some(x => x === data);
   if (description.kind === 'boolean')
     return typeof data === 'boolean';
   if (description.kind === 'null')
@@ -74,7 +74,7 @@ export function isType<T extends Type>(data: any, description: Type & T): data i
   if (description.kind === 'union')
     return isType(data, description.value1) || isType(data, description.value2);
   if (description.kind === 'instanceof')
-    return data instanceof description.value;
+    return data instanceof (description.value as Function);
   if (description.kind === 'object') {
     for (const name in description.properties) {
       if (!isType(data[name], description.properties[name]))
