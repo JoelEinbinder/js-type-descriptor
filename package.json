@@ -1,11 +1,11 @@
 {
-  "name": "type-descriptor",
+  "name": "js-type-descriptor",
   "version": "1.0.0",
   "description": "Allows types to be described with JavaScript, and computes TypeScript types from those descriptions.",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JoelEinbinder/type-descriptor.git"
+    "url": "https://github.com/JoelEinbinder/js-type-descriptor.git"
   },
   "scripts": {
     "lint": "eslint .",

@@ -7,11 +7,11 @@ in the runtime.
 ## Usage
 
 ```sh
-npm i type-descriptor
+npm i js-type-descriptor
 ```
 
 ```ts
-const {isType} = require('type-descriptor');
+const {isType} = require('js-type-descriptor');
 
 if (isType(value, {kind: 'string'} as const)) {
   // value is a string
