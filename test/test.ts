@@ -84,5 +84,5 @@ function expect<T>(a: T) {
       if (a !== b)
         throw new Error('fail');
     }
-  }
+  };
 }

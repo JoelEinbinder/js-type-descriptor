@@ -46,9 +46,9 @@ type UnrollSpecial<A> =
   (J extends {[recursiveSymbol]: infer K} ?
       K : J) : I) : H) : G) : F) : E) : D) : C) : B) : A);
 
-export function isType<T extends Type>(data: any, description: Type & T): data is DescribeType<T> {
+export function isType<T extends Type>(data: unknown, description: Type & T): data is DescribeType<T> {
   if (description.kind === 'enum')
-    return (description.values as any[]).some(x => x === data);
+    return (description.values as unknown[]).some(x => x === data);
   if (description.kind === 'boolean')
     return typeof data === 'boolean';
   if (description.kind === 'null')
@@ -80,7 +80,7 @@ export function isType<T extends Type>(data: any, description: Type & T): data i
       if (!isType(data[name], description.properties[name]))
         return false;
     }
-    return true
+    return true;
   }
   throw new Error('unknown descriptor:' +  description.kind);
 }

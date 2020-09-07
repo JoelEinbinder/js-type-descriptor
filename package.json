@@ -4,11 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint .",
+    "build": "tsc -p .",
+    "watch": "tsc -p . --watch",
+    "test": "node test/test.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Joel Einbinder",
+  "license": "MIT",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "eslint": "^7.8.1",
     "typescript": "^4.0.2"
   }
 }
